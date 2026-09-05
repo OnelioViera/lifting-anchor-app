@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f8fa;
+  --foreground: #171a2b;
+
+  /* Lindsay Precast brand */
+  --lp-navy: #1b2a6b;
+  --lp-navy-dark: #121d4a;
+  --lp-red: #c8202f;
+
+  /* ALP Supply accent (secondary brand reference) */
+  --alp-blue: #0b6cb4;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-lp-navy: var(--lp-navy);
+  --color-lp-navy-dark: var(--lp-navy-dark);
+  --color-lp-red: var(--lp-red);
+  --color-alp-blue: var(--alp-blue);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
