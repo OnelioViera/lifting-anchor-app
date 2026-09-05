@@ -37,19 +37,37 @@ if (!supabaseUrl || !serviceRoleKey) {
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 async function uploadLogo(filename: string): Promise<string> {
-  const filePath = path.join(process.cwd(), "public", "logos", filename);
-  const fileBuffer = readFileSync(filePath);
   const storagePath = `logos/${filename}`;
-
-  const { error } = await supabase.storage
-    .from("catalog")
-    .upload(storagePath, fileBuffer, {
-      contentType: "image/png",
-      upsert: true,
-    });
-  if (error) throw error;
-
   const { data } = supabase.storage.from("catalog").getPublicUrl(storagePath);
+
+  // Best-effort only: skip re-uploading if it's already in storage, and
+  // never let a failed upload kill the rest of the seed run.
+  try {
+    const { data: existing } = await supabase.storage
+      .from("catalog")
+      .list("logos", { search: filename });
+    if (existing?.some((f) => f.name === filename)) {
+      console.log(`  (skipping re-upload of ${filename} — already in storage)`);
+      return data.publicUrl;
+    }
+  } catch (err) {
+    console.warn(`  Could not check for existing ${filename}, will try uploading:`, err);
+  }
+
+  try {
+    const filePath = path.join(process.cwd(), "public", "logos", filename);
+    const fileBuffer = readFileSync(filePath);
+    const { error } = await supabase.storage
+      .from("catalog")
+      .upload(storagePath, fileBuffer, { contentType: "image/png", upsert: true });
+    if (error) throw error;
+  } catch (err) {
+    console.warn(
+      `  Warning: couldn't upload ${filename} (continuing anyway — this only affects the logo image, not the catalog data):`,
+      err
+    );
+  }
+
   return data.publicUrl;
 }
 
