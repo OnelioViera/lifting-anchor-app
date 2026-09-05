@@ -340,6 +340,13 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(err);
-  process.exit(1);
+  console.error("\nSeed script failed:\n");
+  if (err && typeof err === "object") {
+    const { message, details, hint, code, status, name, stack } = err as Record<string, unknown>;
+    console.error({ name, message, details, hint, code, status });
+    if (stack) console.error(String(stack));
+  } else {
+    console.error(err);
+  }
+  process.exitCode = 1;
 });
