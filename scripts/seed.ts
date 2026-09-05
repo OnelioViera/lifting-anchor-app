@@ -15,6 +15,8 @@ import { config as loadEnv } from "dotenv";
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import dns from "node:dns";
+dns.setDefaultResultOrder("ipv4first");
 
 // Plain `dotenv` only loads a file literally named `.env` by default — it
 // doesn't know about Next.js's `.env.local` convention. Load that explicitly
